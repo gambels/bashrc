@@ -30,8 +30,6 @@ export PATH="\${HOME}/bin:\${PATH}"
 export HISTCONTROL="ignoreboth"
 export HISTSIZE=10000
 export PROMPT_DIRTRIM=0
-export USER_NAME=\$(whoami)
-export COLUMNS=\$(tput cols)
 
 # Enable ANSI color escape
 export LESS=-R
@@ -45,7 +43,8 @@ export MANPAGER="vim -M +MANPAGER -c 'set noma nolist nonumber showtabline=1 cc=
 # SSH server administration
 unset SSH_AGENT_PID
 if [ "\${gnupg_SSH_AUTH_SOCK_by:-0}" -ne \$\$ ]; then
-export SSH_AUTH_SOCK="\$(gpgconf --list-dirs agent-ssh-socket)"
+SSH_AUTH_SOCK="\$(gpgconf --list-dirs agent-ssh-socket)"
+export SSH_AUTH_SOCK
 fi
 
 # =============================================================================
@@ -61,7 +60,7 @@ fi
 # Terminal Settings
 # =============================================================================
 
-if [ "\$TERM" != 'linux' || "\$TERM" != 'screen' ]; then
+if [ "\$TERM" != 'linux' ] && [ "\$TERM" != 'screen' ]; then
   # Set the default 256 color TERM
   export TERM=xterm-256color
 fi
@@ -86,6 +85,22 @@ bashrc_settings['completions']=1
 bashrc_settings['options']=1
 bashrc_settings['prompt']=1
 
+# Lib settings
+bashrc_settings['lib/archives']=1
+bashrc_settings['lib/commons']=1
+bashrc_settings['lib/datetime']=1
+bashrc_settings['lib/features']=1
+bashrc_settings['lib/files']=1
+bashrc_settings['lib/find']=1
+bashrc_settings['lib/openssl']=1
+bashrc_settings['lib/testing']=1
+
+# Lib devel settings
+bashrc_settings['lib/devel/commons']=1
+bashrc_settings['lib/devel/git']=1
+bashrc_settings['lib/devel/svn']=1
+bashrc_settings['lib/devel/watch']=1
+
 # Load settings
 for FILE in "\${!bashrc_settings[@]}"
 do
@@ -94,8 +109,8 @@ do
   fi
 done
 
-
 clear
+
 BASHRC_EOF
 )
 set -u
