@@ -1,7 +1,6 @@
 #!/bin/bash
 set -ue
 
-
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 echo "Installing bashrc from $DIR"
 
@@ -25,6 +24,9 @@ export BASHRC_PATH="$DIR/bashrc"
 
 # Add a local binary path for scripts
 export PATH="\${HOME}/bin:\${PATH}"
+
+# Set alternative prompt user name.
+export PROMPT_USER=""
 
 # Misc defaults
 export HISTCONTROL="ignoreboth"

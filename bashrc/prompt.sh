@@ -1,6 +1,7 @@
 #!/bin/bash
 
-source ./colors.sh
+declare SOURCE_DIR="$(dirname $BASH_SOURCE)"
+source "${SOURCE_DIR}/colors.sh"
 
 # +-------------------------------------------------
 # | Style Commandline Prompt
@@ -9,7 +10,7 @@ source ./colors.sh
 # If set, the value is executed as a command prior to issuing each primary prompt.
 PROMPT_COMMAND='RET=$?;'
 
-# Change the window title of X terminals 
+# Change the window title of X terminals.
 case ${TERM} in
   [aEkx]term*|rxvt*|gnome*|konsole*|interix)
     PS1='\[\033]0;\u@\h:\w\007\]'
@@ -22,23 +23,29 @@ case ${TERM} in
     ;;
 esac
 
+# Set specific prompt user name if defined.
+user="\u"
+if [[ $PROMPT_USER ]]; then
+  user="$PROMPT_USER"
+fi
+
 # Set colorful PS1 only on colorful terminals.
 if ${use_color} ; then
   RET_OUT='$(printf "\[$txtwht\][ret: %-3s]" $RET)'
 
   if [[ ${EUID} == 0 ]] ; then
     PSL1=$'\n'"${RET_OUT} [\[${bldblu}\]\w\[${txtrst}\]]"
-    PSL2=$'\n'"\[${bldred}\]\u@\h \[${bldblu}\]\$\[${txtrst}\] "
+    PSL2=$'\n'"\[${bldred}\]${user}@\h \[${bldblu}\]\$\[${txtrst}\] "
   else
     PSL1=$'\n'"${RET_OUT} [\[${bldblu}\]\w\[${txtrst}\]]"
-    PSL2=$'\n'"\[${bldylw}\]\u@\h \[${bldblu}\]\$\[${txtrst}\] "
+    PSL2=$'\n'"\[${bldylw}\]${user}@\h \[${bldblu}\]\$\[${txtrst}\] "
   fi
   PS1+=${PSL1}${PSL2}
 else
   RET_OUT='$(printf "[ret: %-3s]" $RET)'
 
   PSL1=$'\n'"${RET_OUT} [\w]"
-  PSL2=$'\n'"\u@\h \$ "
+  PSL2=$'\n'"${user}@\h \$ "
 
   PS1+=${PSL1}${PSL2}
 fi
