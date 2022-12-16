@@ -10,6 +10,35 @@ source "${SOURCE_DIR}/colors.sh"
 # If set, the value is executed as a command prior to issuing each primary prompt.
 PROMPT_COMMAND='RET=$?;'
 
+# Add git support.
+function git_prompt {
+  git_branch=$(__git_ps1 " (%s)")
+  git_color="$txtylw"
+
+  if false; then
+    case ${git_branch} in
+      *"*"*) git_color="$txtred";;  # is dirty
+      *"$"*) git_color="$txtylw";;  # sometihng stashed
+      *"%"*) git_color="$txtblu";;  # only untracked files
+      *"+"*) git_color="$txtgrn";;  # staged files
+    esac
+  fi
+
+  echo -e "${git_color}${git_branch}"
+}
+
+GIT_PS1=""
+if [[ -f "/etc/bash_completion.d/git-prompt" ]]; then
+  source "/etc/bash_completion.d/git-prompt"
+fi
+if [ "$(type -t __git_ps1)" = function ]; then
+  export GIT_PS1_SHOWUNTRACKEDFILES=true
+  export GIT_PS1_SHOWDIRTYSTATE=true
+  export GIT_PS1_SHOWSTASHSTATE=true
+  export GIT_PS1_SHOWCOLORHINTS=true #works only with PROMPT_COMMAND
+  GIT_PS1='$(git_prompt)'
+fi
+
 # Change the window title of X terminals.
 case ${TERM} in
   [aEkx]term*|rxvt*|gnome*|konsole*|interix)
@@ -34,21 +63,19 @@ if ${use_color} ; then
   RET_OUT='$(printf "\[$txtwht\][ret: %-3s]" $RET)'
 
   if [[ ${EUID} == 0 ]] ; then
-    PSL1=$'\n'"${RET_OUT} [\[${bldblu}\]\w\[${txtrst}\]]"
+    PSL1=$'\n'"${RET_OUT} [\[${bldblu}\]\w\[${txtrst}\]]${GIT_PS1}"
     PSL2=$'\n'"\[${bldred}\]${user}@\h \[${bldblu}\]\$\[${txtrst}\] "
   else
-    PSL1=$'\n'"${RET_OUT} [\[${bldblu}\]\w\[${txtrst}\]]"
+    PSL1=$'\n'"${RET_OUT} [\[${bldblu}\]\w\[${txtrst}\]]${GIT_PS1}"
     PSL2=$'\n'"\[${bldylw}\]${user}@\h \[${bldblu}\]\$\[${txtrst}\] "
   fi
-  PS1+=${PSL1}${PSL2}
 else
   RET_OUT='$(printf "[ret: %-3s]" $RET)'
 
   PSL1=$'\n'"${RET_OUT} [\w]"
   PSL2=$'\n'"${user}@\h \$ "
-
-  PS1+=${PSL1}${PSL2}
 fi
+PS1+="${PSL1}${PSL2}"
 
 # This will run before any command is executed.
 # We want to run only for the first command, not for the whole
