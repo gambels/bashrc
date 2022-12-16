@@ -13,8 +13,8 @@ function bashrc-update()
 
 function open()
 {
-  for i in $@; do
-    xdg-open $i
+  for i in "$@"; do
+    xdg-open "$i"
   done
 }
 
